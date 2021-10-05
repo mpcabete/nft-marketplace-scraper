@@ -1,0 +1,25 @@
+{
+  "name": "nft-marketplace-scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "main": "node --no-warnings index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mpcabete/nft-marketplace-scraper.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mpcabete/nft-marketplace-scraper/issues"
+  },
+  "homepage": "https://github.com/mpcabete/nft-marketplace-scraper#readme",
+  "dependencies": {
+    "d3-dsv": "^3.0.1",
+    "node-fetch": "^3.0.0"
+  }
+}
