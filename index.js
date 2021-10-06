@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import {csvFormat} from 'd3-dsv';
 import { writeFile } from 'fs/promises';
+const maxPages = 500
 
 class Asset{
   // constructor(name, id, price, hash, rarityScore, rarityRank){
@@ -50,9 +51,9 @@ main()
     if(match){
       
       console.log(`${asset.name} price found: ${match.price}`)
-      asset.price = match.price 
+      asset.price = match.price / 1000000
     }else{
-      asset.price = null
+      asset.price = 'not found'
     }
     return asset
   }
@@ -64,34 +65,41 @@ main()
       })
   }
 
-  async function getCnftToolsData(project, n=15){
+  async function getCnftToolsData(project){
     const data = []
     let i = 1 
-    while (i <= n){
+    let numberOfAssets = 1
+
+    while (numberOfAssets !=0 && i < maxPages){
       const page = await getCnftToolsPage(project, i)
-      console.log('cnftTools page '+ i ,page.length)
+      numberOfAssets = page.length
+      console.log('cnftTools page '+ i ,numberOfAssets)
       data.push(...page)
       i++
     }
-    console.log(`cnftools ${n} pages: ${data.length} items`)
+    console.log(`cnftools ${i} pages: ${data.length} items`)
     return data
   }
 
-async function getCnftIoData(project, n=30){
+async function getCnftIoData(project){
     const data = []
     let i = 1 
-    while (i <= n){
+    let numberOfAssets = 1
+
+    while (numberOfAssets !=0 && i < maxPages){
       const page = await getCnftIoPage(project, i)
-      console.log('cnftIo page '+ i ,page.length)
+      numberOfAssets = page.length
+      console.log('cnftIo page '+ i ,numberOfAssets)
       data.push(...page)
       i++
     }
-    console.log(`cnftIo ${n} pages: ${data.length} items`)
+    console.log(`cnftIo ${i} pages: ${data.length} items`)
     return data
 }
 
   async function getCnftToolsPage(project, page){
     const uri = `https://cnft.tools/api/${project}?background=x&body=x&face=x&headwear=x&sort=ASC&method=rarity&page=${page}&`
+    console.log('uri',uri)
     const response = await fetch(uri);
     const responseData = await response.json();
     return responseData.stats
@@ -113,6 +121,7 @@ async function getCnftIoData(project, n=30){
 
     const response = await fetch('https://api.cnft.io/market/listings', {method: 'POST', body: params});
     const responseData = await response.json()
+    console.log('responseData',responseData.assets[0])
     return responseData.assets
   }
 
@@ -124,8 +133,6 @@ async function getCnftIoData(project, n=30){
 // https://api.cnft.io/market/listings
 //
 // error handle nos fetch
-// mudar o numero de paginas hardcoded em 5
 // otmimizar a comparacao dos 2 dicionarios
 // ver o "available" e colocar nos dados
-// descobrir numero exato de paginas ou ver q q acontece no vim
-//
+// colocar um limite de paginas pra ficar mais facil de testar
