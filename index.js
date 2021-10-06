@@ -8,7 +8,7 @@ class Asset{
   constructor(cnftToolsItem){
     this.name = cnftToolsItem.name
     this.id = cnftToolsItem.assetID
-    this.price = cnftToolsItem.price
+    this.price = isNaN(cnftToolsItem.price)?cnftToolsItem.price:cnftToolsItem.price/1000000
     this.hash = cnftToolsItem.url
     this.rarityScore = cnftToolsItem.rarityScore
     this.rarityRank = cnftToolsItem.rarityRank
@@ -16,27 +16,27 @@ class Asset{
 }
 
 async function main(){
+  const toolsProjectName = 'yummiuniverse'
+  const ioProjectName = 'Yummi Universe - Naru'
 
-  const toolsData = await getCnftToolsData('yummiuniverse')
+  // const toolsProjectName = 'claynation'
+  // const ioProjectName = 'Clay Nation by Clay Mates'
+
+  const toolsData = await getCnftToolsData(toolsProjectName)
+  // console.log('toolsData',toolsData[30])
+
   const collection = toolsData.map(item => new Asset(item))
-  // console.log('collection',collection)
 
-  const ioData = await getCnftIoData('Yummi Universe - Naru')
-  const hashsAndPricesMap = getPrices(ioData)
+  const ioData = await getCnftIoData(ioProjectName)
+  const hashsAndAditionnalDataMap = getTargetData(ioData)
 
-  collection.forEach(asset => injectPrice(asset, hashsAndPricesMap))
-  // console.log('ioData',collection)
-  // const ioData = await getCnftIoData('Clay Nation by Clay Mates', 1)
-  // console.log('ioData',ioData
-  // console.log(JSON.stringify(ioData,null,4))
-  //
-  // const prices = getPrices(ioData)
-  // const mergedData = cnftToolsData.map(injectPrice)
+  collection.forEach(asset => injectAditionalData(asset, hashsAndAditionnalDataMap))
   const results = csvFormat(collection)
 
+  const path = './results/'+ioProjectName+'.csv'
   try {
-    await writeFile('data.csv',results);
-    console.log('successfully saved data.csv');
+    await writeFile(path,results);
+    console.log('successfully saved '+path);
   } catch (error) {
     console.error('there was an error:', error.message);
   }
@@ -44,7 +44,7 @@ async function main(){
 main()
   
 
-  function injectPrice(asset,map){
+  function injectAditionalData(asset,map){
     const match = map.find(x=>{
       return x.hash === asset.hash 
     })
@@ -52,15 +52,26 @@ main()
       
       console.log(`${asset.name} price found: ${match.price}`)
       asset.price = match.price / 1000000
+      const attributes = Object.keys(match.attributes)
+      attributes.forEach(name => {asset[name]=match.attributes[name]})
     }else{
-      asset.price = 'not found'
+      // asset.price = 'not found'
     }
     return asset
   }
 
-  function getPrices(ioData){
+  function getTargetData(ioData){
     return ioData.map(x=>{
-        return { hash:x.metadata.thumbnail.slice(-46) , price:x.price }
+      const hash = x.metadata.thumbnail.slice(-46) 
+      const price = x.price
+      // console.log('zz',x.metadata)
+      // TODO: handle o objeto tag recursivamente
+      let attributes = {}
+      if (x?.metadata?.tags[1]?.attributes != null){
+        attributes = x.metadata.tags[1].attributes
+      }
+      return { hash, price, attributes}
+      
 
       })
   }
@@ -99,7 +110,6 @@ async function getCnftIoData(project){
 
   async function getCnftToolsPage(project, page){
     const uri = `https://cnft.tools/api/${project}?background=x&body=x&face=x&headwear=x&sort=ASC&method=rarity&page=${page}&`
-    console.log('uri',uri)
     const response = await fetch(uri);
     const responseData = await response.json();
     return responseData.stats
@@ -121,7 +131,6 @@ async function getCnftIoData(project){
 
     const response = await fetch('https://api.cnft.io/market/listings', {method: 'POST', body: params});
     const responseData = await response.json()
-    console.log('responseData',responseData.assets[0])
     return responseData.assets
   }
 
@@ -134,5 +143,9 @@ async function getCnftIoData(project){
 //
 // error handle nos fetch
 // otmimizar a comparacao dos 2 dicionarios
+//
 // ver o "available" e colocar nos dados
-// colocar um limite de paginas pra ficar mais facil de testar
+// handle error nos atributos
+// now it if it doesent find a io price, it keeps the tool price
+// arrumar o attributos q n aparece em todos os projetos no mesmo formato e quebra o programa
+// deixar mais resistente ao erro e talvez pegar uma laternativa recursiva pra mapear todos os valores do tags

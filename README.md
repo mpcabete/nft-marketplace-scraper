@@ -12,7 +12,10 @@
 - [x] quick refactor
 - [x] implement automatic scraping for more than one page
 - [x] automatically save CSV file
-- [ ] dinamically set the number of pages to be scraped
+- [x] dinamically set the number of pages to be scraped
+- [x] scrape nft attributes
+- [x] fix price unity
+- [ ] find a solution to automatically scrape all attributes for any project
 - [ ] optimize price hash matching script
 - [ ] check the "available" field in the cnftIo response
 - [ ] error handle API calls
