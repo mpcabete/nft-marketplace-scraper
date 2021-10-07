@@ -21,6 +21,8 @@ async function main(){
 
   // const toolsProjectName = 'claynation'
   // const ioProjectName = 'Clay Nation by Clay Mates'
+  //
+  // const ioProjectName = 'Cardoggos'
 
   const toolsData = await getCnftToolsData(toolsProjectName)
   // console.log('toolsData',toolsData[30])
@@ -149,3 +151,4 @@ async function getCnftIoData(project){
 // now it if it doesent find a io price, it keeps the tool price
 // arrumar o attributos q n aparece em todos os projetos no mesmo formato e quebra o programa
 // deixar mais resistente ao erro e talvez pegar uma laternativa recursiva pra mapear todos os valores do tags
+// pegar dados dos cardoggos pro mano
