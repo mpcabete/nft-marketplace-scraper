@@ -8,7 +8,8 @@ class Asset{
   constructor(cnftToolsItem){
     this.name = cnftToolsItem.name
     this.id = cnftToolsItem.assetID
-    this.price = isNaN(cnftToolsItem.price)?cnftToolsItem.price:cnftToolsItem.price/1000000
+    this.price = 'not listed'
+      // to add price from tools io - isNaN(cnftToolsItem.price)?cnftToolsItem.price:cnftToolsItem.price/1000000
     this.hash = cnftToolsItem.url
     this.rarityScore = cnftToolsItem.rarityScore
     this.rarityRank = cnftToolsItem.rarityRank
@@ -33,12 +34,29 @@ async function main(){
   const hashsAndAditionnalDataMap = getTargetData(ioData)
 
   collection.forEach(asset => injectAditionalData(asset, hashsAndAditionnalDataMap))
-  const results = csvFormat(collection)
+  console.log('collection',collection)
 
-  const path = './results/'+ioProjectName+'.csv'
+  const rankSheetData = collection.map(({name,price}) => {return {name,price}})
+  console.log('rankSheetData',rankSheetData)
+  const priceSheetData = collection.map(({name,rarityRank,id})=>{return{name,rarityRank,id}})
+
+  const rankSheet = csvFormat(rankSheetData)
+  const priceSheet = csvFormat(priceSheetData)
+  // const results = csvFormat(collection)
+
+  // const path = './results/'+ioProjectName+'.csv'
+  //
+  const pathRank = './results/'+ioProjectName+'-rank.csv'
+  const pathPrice = './results/'+ioProjectName+'-price.csv'
   try {
-    await writeFile(path,results);
-    console.log('successfully saved '+path);
+    // await writeFile(path,results);
+    await writeFile(pathRank,rankSheet);
+    await writeFile(pathRank,rankSheet);
+    await writeFile('../CSV-example/'+ioProjectName+'-rank.csv',priceSheet);
+    await writeFile('../CSV-example/'+ioProjectName+'-price.csv',rankSheet);
+    await writeFile(pathPrice,priceSheet);
+    console.log('successfully saved rarity sheet'+pathRank);
+    console.log('successfully saved price sheet'+pathPrice);
   } catch (error) {
     console.error('there was an error:', error.message);
   }
@@ -54,8 +72,8 @@ main()
       
       console.log(`${asset.name} price found: ${match.price}`)
       asset.price = match.price / 1000000
-      const attributes = Object.keys(match.attributes)
-      attributes.forEach(name => {asset[name]=match.attributes[name]})
+      // const attributes = Object.keys(match.attributes)
+      // attributes.forEach(name => {asset[name]=match.attributes[name]})
     }else{
       // asset.price = 'not found'
     }
@@ -66,13 +84,15 @@ main()
     return ioData.map(x=>{
       const hash = x.metadata.thumbnail.slice(-46) 
       const price = x.price
-      // console.log('zz',x.metadata)
+      //
+      // attributes:
       // TODO: handle o objeto tag recursivamente
-      let attributes = {}
-      if (x?.metadata?.tags[1]?.attributes != null){
-        attributes = x.metadata.tags[1].attributes
-      }
-      return { hash, price, attributes}
+      //
+      //let attributes = {}
+      //if (x?.metadata?.tags[1]?.attributes != null){
+      //  attributes = x.metadata.tags[1].attributes
+      //}
+      return { hash, price }
       
 
       })
