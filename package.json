@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/mpcabete/nft-marketplace-scraper#readme",
   "dependencies": {
+    "chalk": "^4.1.2",
     "d3-dsv": "^3.0.1",
     "node-fetch": "^3.0.0"
   }

@@ -1,7 +1,29 @@
 import fetch from 'node-fetch';
 import {csvFormat} from 'd3-dsv';
 import { writeFile } from 'fs/promises';
+import chalk from 'chalk'
 const maxPages = 500
+
+const projects = [
+'Clay Mates',
+'SpaceBudz'	,
+'Deadpxlz',
+'SweetFellas',
+'ADAPunkz',
+'Stone Age Hooligans',
+'Baby Alien Club',
+'DeepVision by VisionAI',
+'Lucky Lizard Club',
+'CardanoApes',
+'Very Important Dummies',
+'Cardano Trees',
+'unsigned_algorithms',
+'CryptoDino',
+'Derp Birds',
+'CardanoCity',
+'Drunken Dragon',
+'CardanoBits',
+]
 
 class Asset{
   // constructor(name, id, price, hash, rarityScore, rarityRank){
@@ -16,9 +38,8 @@ class Asset{
   }
 }
 
-async function main(){
-  const toolsProjectName = 'yummiuniverse'
-  const ioProjectName = 'Yummi Universe - Naru'
+async function getData(toolsProjectName,ioProjectName){
+  
 
   // const toolsProjectName = 'claynation'
   // const ioProjectName = 'Clay Nation by Clay Mates'
@@ -26,18 +47,23 @@ async function main(){
   // const ioProjectName = 'Cardoggos'
 
   const toolsData = await getCnftToolsData(toolsProjectName)
-  // console.log('toolsData',toolsData[30])
+  if (toolsData == null){
+    console.log('error in '+ chalk.yellowBright('tools')+' project name:',chalk.red(toolsProjectName))
+    return null
+  }
 
   const collection = toolsData.map(item => new Asset(item))
 
   const ioData = await getCnftIoData(ioProjectName)
+  if(ioData == null){
+    console.log('error in '+ chalk.yellowBright('io')+' project name:', chalk.red(ioProjectName))
+    return null
+  }
   const hashsAndAditionnalDataMap = getTargetData(ioData)
 
   collection.forEach(asset => injectAditionalData(asset, hashsAndAditionnalDataMap))
-  console.log('collection',collection)
 
   const rankSheetData = collection.map(({name,price}) => {return {name,price}})
-  console.log('rankSheetData',rankSheetData)
   const priceSheetData = collection.map(({name,rarityRank,id})=>{return{name,rarityRank,id}})
 
   const rankSheet = csvFormat(rankSheetData)
@@ -61,7 +87,52 @@ async function main(){
     console.error('there was an error:', error.message);
   }
   }
+async function main(){
+const results = await testNames(projects)
+  console.table(results)
+
+  let nProjects = projects.length
+
+  while (nProjects--){
+    await getData(projects[nProjects].toLowerCase().split(' ').join(''),projects[nProjects])
+  }
+
+// getData('yummiuniverse','Yummi Universe - Narul')
+}
 main()
+
+async function testNames(names) {
+
+const correctNamesIO = []
+const incorrectNamesIO = []
+const correctNamesTools = []
+const incorrectNamesTools = []
+  const results = []
+
+ for(let i = 0;i<names.length;i++){
+   const result = []
+   result.push(names[i])
+   const nameTools = names[i].toLowerCase().split(' ').join('')
+   if(await getCnftToolsPage(nameTools,1)!==null){
+     result.push(nameTools)
+
+   }else{
+     result.push('--')
+   }
+
+  
+   const nameIo = names[i]
+   if(await getCnftIoPage(nameIo,1)!==null){
+     result.push(nameIo)
+
+   }else{
+    result.push('--')
+   }
+   results.push(result)
+ }
+  
+  return results
+}
   
 
   function injectAditionalData(asset,map){
@@ -105,6 +176,9 @@ main()
 
     while (numberOfAssets !=0 && i < maxPages){
       const page = await getCnftToolsPage(project, i)
+      if (page == null){
+        return null
+      }
       numberOfAssets = page.length
       console.log('cnftTools page '+ i ,numberOfAssets)
       data.push(...page)
@@ -121,6 +195,9 @@ async function getCnftIoData(project){
 
     while (numberOfAssets !=0 && i < maxPages){
       const page = await getCnftIoPage(project, i)
+      if (page == null){
+        return null
+      }
       numberOfAssets = page.length
       console.log('cnftIo page '+ i ,numberOfAssets)
       data.push(...page)
@@ -133,6 +210,11 @@ async function getCnftIoData(project){
   async function getCnftToolsPage(project, page){
     const uri = `https://cnft.tools/api/${project}?background=x&body=x&face=x&headwear=x&sort=ASC&method=rarity&page=${page}&`
     const response = await fetch(uri);
+
+    if (response.status != 200){
+      console.log('status',response.status)
+      return null 
+    }
     const responseData = await response.json();
     return responseData.stats
   }
@@ -152,6 +234,12 @@ async function getCnftIoData(project){
     
 
     const response = await fetch('https://api.cnft.io/market/listings', {method: 'POST', body: params});
+
+    if (response.status != 200){
+      console.log('status',response.status)
+      return null 
+    }
+
     const responseData = await response.json()
     return responseData.assets
   }
@@ -172,3 +260,8 @@ async function getCnftIoData(project){
 // arrumar o attributos q n aparece em todos os projetos no mesmo formato e quebra o programa
 // deixar mais resistente ao erro e talvez pegar uma laternativa recursiva pra mapear todos os valores do tags
 // pegar dados dos cardoggos pro mano
+//1	Yummi Universe	882589	2270
+//prettify log
+// change generated names to hard coded array
+// tirar consts sobrando no results
+// nao rodar o tools se o nome io ta quebrado
