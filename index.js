@@ -93,8 +93,8 @@ async function getProjectData(name){
     // await writeFile(path,results);
     await writeFile(pathRank,rankSheet);
     await writeFile(pathRank,rankSheet);
-    await writeFile('../CSV-example/'+ioProjectName+'-rank.csv',priceSheet);
-    await writeFile('../CSV-example/'+ioProjectName+'-price.csv',rankSheet);
+    // await writeFile('../CSV-example/'+ioProjectName+'-rank.csv',priceSheet);
+    // await writeFile('../CSV-example/'+ioProjectName+'-price.csv',rankSheet);
     await writeFile(pathPrice,priceSheet);
     console.log('successfully saved rarity sheet'+pathRank);
     console.log('successfully saved price sheet'+pathPrice);
@@ -114,7 +114,7 @@ async function main(){
 
   }
 
-  await writeFile('../CSV-example/last-update-date.txt',new Date().toUTCString());
+  // await writeFile('../CSV-example/last-update-date.txt',new Date().toUTCString());
     // await getData(projects[nProjects].toLowerCase().split(' ').join(''),projects[nProjects])
 
 // getData('yummiuniverse','Yummi Universe - Narul')
