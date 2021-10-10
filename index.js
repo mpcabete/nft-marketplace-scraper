@@ -5,37 +5,54 @@ import chalk from 'chalk'
 const maxPages = 500
 
 const projects = [
-'Clay Mates',
-'SpaceBudz'	,
-'Deadpxlz',
-'SweetFellas',
-'ADAPunkz',
-'Stone Age Hooligans',
-'Baby Alien Club',
-'DeepVision by VisionAI',
-'Lucky Lizard Club',
-'CardanoApes',
-'Very Important Dummies',
-'Cardano Trees',
-'unsigned_algorithms',
-'CryptoDino',
-'Derp Birds',
-'CardanoCity',
-'Drunken Dragon',
-'CardanoBits',
+'Clay Mates',// not in tools
+'SpaceBudz'	, // ok
+'Deadpxlz',// not in tools
+'Yummi Universe', // ok
+'ADA Ninjaz', // ok
+'SweetFellas', //not in tools
+'ADAPunkz', // ok
+'Stone Age Hooligans', // not in tools
+'Baby Alien Club', // io BabyAlienClub
+'DeepVision by VisionAI', // not in tools
+'Lucky Lizard Club',// ok 
+'CardanoApes',//2dcardanoapes in tools
+'Very Important Dummies', // VeryImportantDummies on io
+'Cardano Trees', // CardanoTrees on io
+'unsigned_algorithms', // not in tools
+'CryptoDino', // ok
+'Derp Birds', // ok
+'CardanoCity', // not in tools
+'Drunken Dragon', // not found
+'CardanoBits', // ok
 ]
 
 //project name, tools name and io name
-const filteredProjects = [
+const filteredProjects =
+[
+  // [ 'Clay Mates', '--', 'Clay Mates' ],
   [ 'SpaceBudz', 'spacebudz', 'SpaceBudz' ],
+  // [ 'Deadpxlz', '--', 'Deadpxlz' ],
+  [ 'Yummi Universe', 'yummiuniverse', 'Yummi Universe' ],
+  [ 'ADA Ninjaz', 'adaninjaz', 'ADA Ninjaz' ],
+  // [  'SweetFellas', '--', '--' ],
   [ 'ADAPunkz', 'adapunkz', 'ADAPunkz' ],
+  // [ 'Stone Age Hooligans', '--', '--' ],
+  [ 'Baby Alien Club', 'babyalienclub', 'BabyAlienClub' ],
+  // [ 'DeepVision by VisionAI', '--', 'DeepVision by VisionAI' ],
   [ 'Lucky Lizard Club', 'luckylizardclub', 'Lucky Lizard Club' ],
+  [ 'CardanoApes', '2dcardanoapes', 'CardanoApes' ],
+  [ 'Very Important Dummies', 'veryimportantdummies', 'VeryImportantDummies' ],
+  [ 'Cardano Trees', 'cardanotrees', 'CardanoTrees' ],
+  // [ 'unsigned_algorithms', '--', 'unsigned_algorithms' ],
   [ 'CryptoDino', 'cryptodino', 'CryptoDino' ],
   [ 'Derp Birds', 'derpbirds', 'Derp Birds' ],
+  // [ 'CardanoCity', '--', 'CardanoCity' ],
+  // [ 'Drunken Dragon', '--', '--' ],
   [ 'CardanoBits', 'cardanobits', 'CardanoBits' ]
 ]
 
-class Asset{
+  class Asset{
   // constructor(name, id, price, hash, rarityScore, rarityRank){
   constructor(cnftToolsItem){
     this.name = cnftToolsItem.name.replace(/[^\w\s]/g,'')
@@ -104,9 +121,6 @@ async function getProjectData(name){
   }
 async function main(){
   // const results = await testNames(projects)
-  // console.table(results)
-  // const filtered = results.filter(r=>r[1] !== '--' && r[2] !== '--')
-  // console.log(filtered)
 
   for(let i = 0;i<filteredProjects.length;i++){
 
@@ -121,6 +135,7 @@ async function main(){
 }
 
 main()
+// testNames(projects)
 
   
 
@@ -272,6 +287,9 @@ async function testNames(names) {
    results.push(result)
  }
   
+  console.table(results)
+  console.log(results)
+  const filtered = results.filter(r=>r[1] !== '--' && r[2] !== '--')
   return results
 }
 
@@ -283,15 +301,9 @@ async function testNames(names) {
 // https://api.cnft.io/market/listings
 //
 // error handle nos fetch
-// otmimizar a comparacao dos 2 dicionarios
 //
-// ver o "available" e colocar nos dados
 // handle error nos atributos
 // arrumar o attributos q n aparece em todos os projetos no mesmo formato e quebra o programa
 // deixar mais resistente ao erro e talvez pegar uma laternativa recursiva pra mapear todos os valores do tags
-// pegar dados dos cardoggos pro mano
-// prettify log
-// change generated names to hard coded array
-// tirar consts sobrando no results
 // nao rodar o tools se o nome io ta quebrado
 // checkar pq ta dano erro no primeiro nome
