@@ -2,55 +2,13 @@ import fetch from 'node-fetch';
 import {csvFormat} from 'd3-dsv';
 import { writeFile } from 'fs/promises';
 import chalk from 'chalk'
-const maxPages = 500
+import { projectNames} from './project-names.js'
+const maxPages = 5
 
-const projects = [
-'Clay Mates',// not in tools
-'SpaceBudz'	, // ok
-'Deadpxlz',// not in tools
-'Yummi Universe', // ok
-'ADA Ninjaz', // ok
-'SweetFellas', //not in tools
-'ADAPunkz', // ok
-'Stone Age Hooligans', // not in tools
-'Baby Alien Club', // io BabyAlienClub
-'DeepVision by VisionAI', // not in tools
-'Lucky Lizard Club',// ok 
-'CardanoApes',//2dcardanoapes in tools
-'Very Important Dummies', // VeryImportantDummies on io
-'Cardano Trees', // CardanoTrees on io
-'unsigned_algorithms', // not in tools
-'CryptoDino', // ok
-'Derp Birds', // ok
-'CardanoCity', // not in tools
-'Drunken Dragon', // not found
-'CardanoBits', // ok
-]
-
-//project name, tools name and io name
-const filteredProjects =
-[
-  // [ 'Clay Mates', '--', 'Clay Mates' ],
-  [ 'SpaceBudz', 'spacebudz', 'SpaceBudz' ],
-  // [ 'Deadpxlz', '--', 'Deadpxlz' ],
-  [ 'Yummi Universe', 'yummiuniverse', 'Yummi Universe' ],
-  [ 'ADA Ninjaz', 'adaninjaz', 'ADA Ninjaz' ],
-  // [  'SweetFellas', '--', '--' ],
-  [ 'ADAPunkz', 'adapunkz', 'ADAPunkz' ],
-  // [ 'Stone Age Hooligans', '--', '--' ],
-  [ 'Baby Alien Club', 'babyalienclub', 'BabyAlienClub' ],
-  // [ 'DeepVision by VisionAI', '--', 'DeepVision by VisionAI' ],
-  [ 'Lucky Lizard Club', 'luckylizardclub', 'Lucky Lizard Club' ],
-  [ 'CardanoApes', '2dcardanoapes', 'CardanoApes' ],
-  [ 'Very Important Dummies', 'veryimportantdummies', 'VeryImportantDummies' ],
-  [ 'Cardano Trees', 'cardanotrees', 'CardanoTrees' ],
-  // [ 'unsigned_algorithms', '--', 'unsigned_algorithms' ],
-  [ 'CryptoDino', 'cryptodino', 'CryptoDino' ],
-  [ 'Derp Birds', 'derpbirds', 'Derp Birds' ],
-  // [ 'CardanoCity', '--', 'CardanoCity' ],
-  // [ 'Drunken Dragon', '--', '--' ],
-  [ 'CardanoBits', 'cardanobits', 'CardanoBits' ]
-]
+let [node, path, resultsPath='./results/'] = process.argv
+if(resultsPath[resultsPath.length-1] != '/'){
+  resultsPath += '/'
+}
 
   class Asset{
   // constructor(name, id, price, hash, rarityScore, rarityRank){
@@ -104,8 +62,8 @@ async function getProjectData(name){
 
   // const path = './results/'+ioProjectName+'.csv'
   //
-  const pathRank = './results/'+ioProjectName+'-rank.csv'
-  const pathPrice = './results/'+ioProjectName+'-price.csv'
+  const pathRank = resultsPath+ioProjectName+'-rank.csv'
+  const pathPrice = resultsPath+ioProjectName+'-price.csv'
   try {
     // await writeFile(path,results);
     await writeFile(pathRank,rankSheet);
@@ -122,13 +80,13 @@ async function getProjectData(name){
 async function main(){
   // const results = await testNames(projects)
 
-  for(let i = 0;i<filteredProjects.length;i++){
+  for(let i = 0;i<projectNames.length;i++){
 
-    await getProjectData(filteredProjects[i])
+    await getProjectData(projectNames[i])
 
   }
 
-  // await writeFile('../CSV-example/last-update-date.txt',new Date().toUTCString());
+  await writeFile(resultsPath + 'last-update',new Date().toUTCString());
     // await getData(projects[nProjects].toLowerCase().split(' ').join(''),projects[nProjects])
 
 // getData('yummiuniverse','Yummi Universe - Narul')
@@ -185,7 +143,7 @@ main()
     let i = 1 
     let numberOfAssets = Infinity
 
-    while (numberOfAssets !=0 && i < maxPages){
+    while (numberOfAssets !=0 && i <= maxPages){
       const page = await getCnftToolsPage(project, i)
       if (page == null){
         return null
@@ -255,43 +213,14 @@ async function getCnftIoData(project){
     return responseData.assets
   }
 
-
-
-
-
-async function testNames(names) {
-
-  const results = []
-
- for(let i = 0;i<names.length;i++){
-   const result = []
-   result.push(names[i])
-   const nameTools = names[i].toLowerCase().split(' ').join('')
-   console.log('testing ',nameTools, 'on cnft.tools')
-   if(await getCnftToolsPage(nameTools,1)!==null){
-     result.push(nameTools)
-
-   }else{
-     result.push('--')
-   }
-
-  
-   const nameIo = names[i]
-   console.log('testing ',nameIo, 'on io.tools')
-   if(await getCnftIoPage(nameIo,1)!==null){
-     result.push(nameIo)
-
-   }else{
-    result.push('--')
-   }
-   results.push(result)
- }
-  
-  console.table(results)
-  console.log(results)
-  const filtered = results.filter(r=>r[1] !== '--' && r[2] !== '--')
-  return results
+export {
+ getCnftIoPage,
+ getCnftToolsPage
 }
+
+
+
+
 
 // project list endpoint
 // https://api.cnft.io/market/projects 
