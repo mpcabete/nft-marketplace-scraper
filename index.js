@@ -3,7 +3,7 @@ import {csvFormat} from 'd3-dsv';
 import { writeFile } from 'fs/promises';
 import chalk from 'chalk'
 import { projectNames} from './project-names.js'
-const maxPages = 5
+const maxPages = 500
 
 let [node, path, resultsPath='./results/'] = process.argv
 if(resultsPath[resultsPath.length-1] != '/'){
