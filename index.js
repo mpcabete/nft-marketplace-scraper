@@ -67,7 +67,6 @@ async function getProjectData(name){
   try {
     // await writeFile(path,results);
     await writeFile(pathRank,rankSheet);
-    await writeFile(pathRank,rankSheet);
     // await writeFile('../CSV-example/'+ioProjectName+'-rank.csv',priceSheet);
     // await writeFile('../CSV-example/'+ioProjectName+'-price.csv',rankSheet);
     await writeFile(pathPrice,priceSheet);
