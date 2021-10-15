@@ -53,8 +53,8 @@ async function getProjectData(name){
     return
   }
 
-  const rankSheetData = collection.map(({name,price}) => {return {name,price}})
-  const priceSheetData = collection.map(({name,rarityRank,id})=>{return{name,rarityRank,id}})
+  const priceSheetData = collection.map(({name,price}) => {return {name,price}})
+  const rankSheetData = collection.map(({name,rarityRank,id})=>{return{name,rarityRank,id}})
 
   const rankSheet = csvFormat(rankSheetData)
   const priceSheet = csvFormat(priceSheetData)
